@@ -52,6 +52,8 @@ RUN git clone https://github.com/bghira/SimpleTuner --branch $SIMPLETUNER_BRANCH
     && cd SimpleTuner \
     && pip install --no-cache-dir -e .[jxl] \
     && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6
+    && pip install peft torchao \
+    && pip install 'simpletuner[cuda13,captioning]' --extra-index-url https://download.pytorch.org/whl/cu130
    
 VOLUME /workspace
 
