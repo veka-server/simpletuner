@@ -1,0 +1,55 @@
+name: Sync upstream releases
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get latest upstream release
+        id: upstream
+        run: |
+          response=$(curl -s https://api.github.com/repos/bghira/SimpleTuner/releases/latest)
+      
+          tag=$(echo "$response" | jq -r .tag_name)
+      
+          if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+            echo "❌ Failed to get valid tag"
+            echo "$response"
+            exit 1
+          fi
+      
+          clean_tag=${tag#v}
+      
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "clean_tag=$clean_tag" >> $GITHUB_OUTPUT
+
+      - name: Check if release already exists
+        id: check
+        run: |
+          if gh release view "${{ steps.upstream.outputs.clean_tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_simpletuner }}
+
+      - name: Create release
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          gh release create "${{ steps.upstream.outputs.clean_tag }}" \
+            --title "Release ${{ steps.upstream.outputs.clean_tag }}" \
+            --notes "Synced from upstream release ${{ steps.upstream.outputs.tag }}"
+        env:
+          GH_TOKEN: ${{ secrets.GHCR_simpletuner }}
