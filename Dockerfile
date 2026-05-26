@@ -50,16 +50,13 @@ RUN python${PYTHON_VERSION} -m venv /opt/venv \
 ARG SIMPLETUNER_BRANCH=release
 RUN git clone https://github.com/bghira/SimpleTuner --branch $SIMPLETUNER_BRANCH \
     && cd SimpleTuner \
+    && ln -s ./docker-start.sh /start.sh \
     && pip install --no-cache-dir -e .[jxl] \
     && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6
-
-# 4. Setup Runtime (use file from cloned repo)
-RUN chmod +x /SimpleTuner/docker-start.sh \
-    && ln -s /SimpleTuner/docker-start.sh /start.sh
-    
+   
 VOLUME /workspace
 
-# SSH & WebUI Ports
+# WebUI Ports
 EXPOSE 8001
 
 ENTRYPOINT [ "/start.sh" ]
