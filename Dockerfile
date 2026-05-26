@@ -53,8 +53,10 @@ RUN git clone https://github.com/bghira/SimpleTuner --branch $SIMPLETUNER_BRANCH
     && pip install --no-cache-dir -e .[jxl] \
     && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6
 
-# 4. Setup Runtime
-COPY --chmod=755 docker-start.sh /start.sh
+# 4. Setup Runtime (use file from cloned repo)
+RUN chmod +x /SimpleTuner/docker-start.sh \
+    && ln -s /SimpleTuner/docker-start.sh /start.sh
+    
 VOLUME /workspace
 
 # SSH & WebUI Ports
