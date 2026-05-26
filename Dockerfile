@@ -50,9 +50,9 @@ RUN python${PYTHON_VERSION} -m venv /opt/venv \
 ARG SIMPLETUNER_BRANCH=release
 RUN git clone https://github.com/bghira/SimpleTuner --branch $SIMPLETUNER_BRANCH \
     && cd SimpleTuner \
-    && pip install --no-cache-dir -e .[jxl] \
-    && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6 \
-    && pip install peft torchao-0.14.1
+    && pip install --no-cache-dir -e .[jxl,captioning] \
+    && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6
+#    && pip install peft torchao-0.14.1
    
 VOLUME /workspace
 
